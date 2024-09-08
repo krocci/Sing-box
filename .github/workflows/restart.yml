@@ -32,7 +32,7 @@ jobs:
           local SERVER=$1
           local USERNAME=$2
           local PASSWORD=$3
-          local PORT1=$4
+          local PORT=$4
           local UUID=$5
           local CFIP=$6
           local ARGO_DOMAIN=$7
@@ -48,8 +48,8 @@ jobs:
           PASSWORD=${DETAILS[2]}
           PORT=${DETAILS[3]}
           UUID=${DETAILS[4]}
-          $ARGO_DOMAIN=${DETAILS[5]}
-          $ARGO_AUTH=${DETAILS[6]}
+          ARGO_DOMAIN=${DETAILS[5]}
+          ARGO_AUTH=${DETAILS[6]}
           
           
           FAIL_COUNT=0
