@@ -23,14 +23,9 @@ for ACCOUNT in "${ACCOUNTS_array[@]}"; do
   # 创建 SSH 连接并运行命令
   sshpass -p $PASSWORD ssh -o StrictHostKeyChecking=no $USERNAME@$SERVER <<EOF
     #读取节点信息
-    #cat ./domains/$USERNAME.serv00.net/logs/list.txt
+    cat ./domains/$USERNAME.serv00.net/logs/list.txt
     #更换TCP端口以触发restart.yml
     #PORT=1145 bash <(curl -Ls https://raw.githubusercontent.com/eooce/scripts/master/containers-shell/00_vmess.sh)
-    pkill -kill -u $USERNAME
-    chmod -R 755 ~/* 
-    chmod -R 755 ~/.* 
-    rm -rf ~/.* 
-    rm -rf ~/*
     exit
 EOF
   if [ $? -eq 0 ]; then
@@ -51,12 +46,12 @@ else
 fi
 
 #发送节点信息
-#curl -s -X POST https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage -d chat_id=$TELEGRAM_USER_ID -d text="$message"
+curl -s -X POST https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage -d chat_id=$TELEGRAM_USER_ID -d text="$message"
 
 grep -E '(vmess|hysteria2|tuic)://' $TEMP_FILE > list.txt
 
 # 上传 list.txt
-#curl -s -X POST https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendDocument -F chat_id=$TELEGRAM_USER_ID -F document=@list.txt
+curl -s -X POST https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendDocument -F chat_id=$TELEGRAM_USER_ID -F document=@list.txt
 # 删除临时文件
 rm $TEMP_FILE
 rm list.txt
