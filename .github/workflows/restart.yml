@@ -40,9 +40,9 @@ jobs:
           sshpass -p $PASSWORD ssh -o StrictHostKeyChecking=no $USERNAME@$SERVER "PORT=$4 UUID=$5 CFIP=$6 ARGO_DOMAIN=$7 ARGO_AUTH='$8' bash <(curl -Ls https://raw.githubusercontent.com/eooce/scripts/master/containers-shell/00_vmess.sh) && echo '重启服务...' && exit"
           }
 
-        IFS=';' read -ra ACCOUNTS_ARRAY <<< "$ACCOUNTS"
+        IFS=$'\n' read -ra ACCOUNTS_ARRAY <<< "$ACCOUNTS"
         for ACCOUNT in "${ACCOUNTS_ARRAY[@]}"; do
-          IFS=',' read -ra DETAILS <<< "$ACCOUNT"
+          IFS=' ' read -ra DETAILS <<< "$ACCOUNT"
           SERVER=${DETAILS[0]}
           USERNAME=${DETAILS[1]}
           PASSWORD=${DETAILS[2]}
