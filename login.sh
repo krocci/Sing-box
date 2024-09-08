@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # 将 ACCOUNTS 转换为数组
-IFS=$'\n' read -r -a ACCOUNTS_array <<< "$ACCOUNTS"\
+IFS=';' read -r -a ACCOUNTS_array <<< "$ACCOUNTS"\
 
 # 创建一个临时文件来存储所有的 list.txt 内容
 TEMP_FILE=$(mktemp)
