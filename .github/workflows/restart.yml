@@ -1,0 +1,77 @@
+name: 检测TCP连接
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'  # 每30分钟运行一次
+  workflow_dispatch:  # 手动触发
+
+jobs:
+  check-ports:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.x'
+
+    - name: Install netcat
+      run: sudo apt-get install -y netcat
+
+    - name: Check TCP Ports
+      env:
+        ACCOUNTS: ${{ secrets.ACCOUNTS }}
+        CFIP: ${{ secrets.CFIP }}
+        TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        TELEGRAM_USER_ID: ${{ secrets.TELEGRAM_USER_ID }}
+        
+      run: |
+        function restart_server {
+          local SERVER=$1
+          local USERNAME=$2
+          local PASSWORD=$3
+          local PORT1=$4
+          local UUID=$5
+          local CFIP=$6
+          local ARGO_DOMAIN=$7
+          local ARGO_AUTH=$8
+          sshpass -p $PASSWORD ssh -o StrictHostKeyChecking=no $USERNAME@$SERVER "VMESS_PORT=$4 UUID=$5 CFIP=$6 ARGO_DOMAIN=$7 ARGO_AUTH='$8' PORT=TCP端口 bash <(curl -Ls https://raw.githubusercontent.com/eooce/scripts/master/containers-shell/00_vmess.sh) && echo '重启服务...' && exit"
+          }
+
+        IFS=';' read -ra ACCOUNTS_ARRAY <<< "$ACCOUNTS"
+        for ACCOUNT in "${ACCOUNTS_ARRAY[@]}"; do
+          IFS=',' read -ra DETAILS <<< "$ACCOUNT"
+          SERVER=${DETAILS[0]}
+          USERNAME=${DETAILS[1]}
+          PASSWORD=${DETAILS[2]}
+          PORT=${DETAILS[3]}
+          UUID=${DETAILS[4]}
+          $ARGO_DOMAIN=${DETAILS[5]}
+          $ARGO_AUTH=${DETAILS[6]}
+          
+          
+          FAIL_COUNT=0
+          SUCCESS=false
+          for i in {1..5}; do
+            if nc -zv $SERVER $PORT; then
+              echo " $USERNAME tcp连接正常"
+              SUCCESS=true
+              break
+            else
+              echo "tcp端口关闭,服务可能关闭，30s后重试..."
+              FAIL_COUNT=$((FAIL_COUNT+1))
+              if [ $i -lt 5 ]; then
+                sleep 30
+                echo "tcp不通"
+              fi
+            fi
+          done
+          if [ "$SUCCESS" = false ]; then
+            echo "开始重启 $USERNAME@$SERVER"
+            restart_server $SERVER $USERNAME $PASSWORD $PORT $UUID $CFIP $ARGO_DOMAIN $ARGO_AUTH
+            #发送telegram通知
+            curl -s -X POST https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage -d chat_id=$TELEGRAM_USER_ID -d text="已重启 $USERNAME@$SERVER"
+          fi
+        done
