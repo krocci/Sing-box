@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # 将 ACCOUNTS 转换为数组
-IFS=';' read -r -a ACCOUNTS_array <<< "$ACCOUNTS"\
+IFS=$'\n' read -r -a ACCOUNTS_array <<< "$ACCOUNTS"\
 
 # 创建一个临时文件来存储所有的 list.txt 内容
 TEMP_FILE=$(mktemp)
@@ -13,7 +13,7 @@ failed_users=()
 
 # 循环处理每组数据
 for ACCOUNT in "${ACCOUNTS_array[@]}"; do
-  IFS=',' read -r -a credentials <<< "$ACCOUNT"
+  IFS=' ' read -r -a credentials <<< "$ACCOUNT"
   SERVER=${credentials[0]}
   USERNAME=${credentials[1]}
   PASSWORD=${credentials[2]}
