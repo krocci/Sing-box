@@ -25,7 +25,7 @@ for ACCOUNT in "${ACCOUNTS_array[@]}"; do
     #读取节点信息
     cat ./domains/$USERNAME.serv00.net/logs/list.txt
     #更换TCP端口以触发restart.yml
-    PORT=1145 bash <(curl -Ls https://raw.githubusercontent.com/eooce/scripts/master/containers-shell/00_vmess.sh)
+    #PORT=1145 bash <(curl -Ls https://raw.githubusercontent.com/eooce/scripts/master/containers-shell/00_vmess.sh)
     exit
 EOF
   if [ $? -eq 0 ]; then
