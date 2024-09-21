@@ -25,8 +25,12 @@ for ACCOUNT in "${ACCOUNTS_array[@]}"; do
     echo "$USERNAME登录成功"
     #读取节点信息
     #cat ./domains/$USERNAME.serv00.net/logs/list.txt
-    #更换TCP端口以触发restart.yml
-    #PORT=1145 bash <(curl -Ls https://raw.githubusercontent.com/eooce/scripts/master/containers-shell/00_vmess.sh)
+    #重置服务器
+    #pkill -kill -u $USERNAME
+    #chmod -R 755 ~/* 
+    #chmod -R 755 ~/.* 
+    #rm -rf ~/.* 
+    #rm -rf ~/*
     exit
 EOF
   if [ $? -eq 0 ]; then
